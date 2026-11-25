@@ -1,608 +1,1213 @@
-1. Variables, assignment, dynamic typing
-What it is
-A variable in Python is a name bound to an object. Assignment does not copy a value into a box — it makes a name point at an object that lives somewhere in memory.
+# Python Fundamentals: Variables, Types & Core Syntax
 
-x = 42          # create int object 42, bind the name "x" to it
-y = x           # bind "y" to the SAME object; nothing is copied
-print(x, y)     # -> 42 42
-print(x is y)   # -> True   (same object identity)
-id() shows the identity (in CPython, the memory address):
+> A practical beginner-friendly reference for Python's core syntax.  
+> Work through the **Core concepts** first. The **Deeper details** sections are useful reference material—don't feel you need to memorize everything at once.
 
+---
+
+## Learning roadmap
+
+1. [Variables, assignment, and dynamic typing](#1-variables-assignment-and-dynamic-typing)
+2. [Numeric types and arithmetic](#2-numeric-types-and-arithmetic)
+3. [Booleans and truthiness](#3-booleans-and-truthiness)
+4. [Strings](#4-strings)
+5. [The `None` value](#5-the-none-value)
+6. [Type conversion and type checking](#6-type-conversion-and-type-checking)
+7. [Comments and docstrings](#7-comments-and-docstrings)
+8. [Practice exercises](#8-practice-exercises)
+9. [Quick reference](#9-quick-reference)
+
+### How to use these notes
+
+- **Read:** Understand the explanation before moving on.
+- **Run:** Type the examples into a `.py` file or the Python REPL.
+- **Predict:** Guess the output before running the code.
+- **Practise:** Complete the exercises without immediately looking up the answer.
+- **Review:** Return to the common mistakes when something behaves unexpectedly.
+
+### Difficulty guide
+
+- **Core concept** — learn and practise this now.
+- **Useful detail** — understand the idea; memorization can wait.
+- **Deeper detail** — keep as a reference for later.
+
+---
+
+# 1. Variables, assignment, and dynamic typing
+
+## 1.1 What is a variable?
+
+A variable is a **name that refers to an object**. Assignment with `=` binds a name to an object.
+
+```python
+age = 22
+name = "Saif"
+
+print(age)
+print(name)
+```
+
+**Output**
+```text
+22
+Saif
+```
+
+Think of a variable name as a label attached to an object. It is not a box that permanently stores one kind of value.
+
+## 1.2 Assigning one variable to another
+
+```python
+x = 42
+y = x
+
+print(x, y)
+```
+
+**Output**
+```text
+42 42
+```
+
+Both names refer to the same integer object. With immutable objects such as integers and strings, this usually feels like ordinary value assignment.
+
+Lists are mutable, so shared references become more visible:
+
+```python
 a = [1, 2, 3]
 b = a
-print(id(a) == id(b))   # -> True
+
 b.append(4)
-print(a)                # -> [1, 2, 3, 4]   <- a "changed" because a and b are the same list
-Rebinding a name never affects other names:
 
+print(a)
+print(b)
+```
+
+**Output**
+```text
+[1, 2, 3, 4]
+[1, 2, 3, 4]
+```
+
+`a` and `b` refer to the same list. Changing that list through `b` is visible through `a` too.
+
+### Reassignment is different from mutation
+
+```python
 a = [1, 2, 3]
 b = a
-b = [9, 9]      # REBIND b to a new list. a is untouched.
-print(a)        # -> [1, 2, 3]
-Dynamic typing
-The object has a type; the name does not. A name can point at anything, and can be re-pointed at something of a different type.
 
-v = 10
-print(type(v))      # -> <class 'int'>
-v = "now a string"
-print(type(v))      # -> <class 'str'>
-v = [1, 2]
-print(type(v))      # -> <class 'list'>
-Python is dynamically typed (types checked at runtime) but also strongly typed (it will not silently coerce unrelated types):
+b = [9, 9]  # b now refers to a different list
 
-print(1 + 2)        # -> 3
-print("1" + "2")    # -> '12'
-print(1 + "2")      # !! TypeError: unsupported operand type(s) for +: 'int' and 'str'
-Compare with JavaScript, which is dynamically and weakly typed (1 + "2" === "12").
+print(a)
+print(b)
+```
 
-Assignment forms
-a = b = c = 0                # chained: all three names -> the same int 0
-x, y = 1, 2                  # tuple unpacking
-x, y = y, x                  # swap, no temp variable needed
-print(x, y)                  # -> 2 1
+**Output**
+```text
+[1, 2, 3]
+[9, 9]
+```
 
-first, *rest = [1, 2, 3, 4]  # extended unpacking (Tier 2)
-print(first, rest)           # -> 1 [2, 3, 4]
+Reassigning `b` does not change the original list.
 
-n = 5
-n += 3                       # augmented assignment
-print(n)                     # -> 8
-Naming rules and conventions (PEP 8)
-snake_case_for_variables_and_functions = 1
-CONSTANTS_IN_UPPER_SNAKE = 3.14159
-class PascalCaseForClasses: ...
-_internal_use = "leading underscore: 'private by convention'"
-__name_mangled = "double leading underscore inside a class: name mangling"
-trailing_underscore_ = "avoid clashing with a keyword, e.g. class_, id_, list_"
-Names may contain letters, digits and _, but cannot start with a digit and cannot be a keyword.
+## 1.3 Dynamic typing
 
+Python is dynamically typed: a name can be rebound to objects of different types.
+
+```python
+value = 10
+print(type(value))
+
+value = "hello"
+print(type(value))
+
+value = [1, 2, 3]
+print(type(value))
+```
+
+**Output**
+```text
+<class 'int'>
+<class 'str'>
+<class 'list'>
+```
+
+The object has a type; the variable name does not have a permanent type.
+
+Python is also strongly typed. It does not automatically combine unrelated types in every situation:
+
+```python
+print(1 + 2)       # 3
+print("1" + "2")   # 12
+print(1 + "2")     # TypeError
+```
+
+## 1.4 Common assignment forms
+
+```python
+# Assign one value to several names
+a = b = c = 0
+
+# Assign several values at once
+x, y = 1, 2
+
+# Swap two values
+x, y = y, x
+
+# Augmented assignment
+count = 5
+count += 3
+print(count)  # 8
+```
+
+Extended unpacking is useful when you want to collect the remaining values:
+
+```python
+first, *rest = [1, 2, 3, 4]
+
+print(first)  # 1
+print(rest)   # [2, 3, 4]
+```
+
+## 1.5 Naming rules and conventions
+
+**Rules:**
+
+- A name may contain letters, digits, and underscores.
+- A name cannot begin with a digit.
+- A name cannot be a Python keyword.
+- Names are case-sensitive: `score` and `Score` are different names.
+
+**PEP 8 conventions:**
+
+```python
+user_name = "Ada"             # variables and functions: snake_case
+MAX_RETRIES = 3               # constants: UPPER_SNAKE_CASE
+
+class UserProfile:
+    pass                      # classes: PascalCase
+```
+
+A leading underscore, such as `_internal_value`, signals that a name is intended for internal use by convention.
+
+To inspect Python keywords:
+
+```python
 import keyword
-print(keyword.kwlist[:8])
-# -> ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await']
-print(keyword.iskeyword("match"))      # -> False  (match is a SOFT keyword)
-print(keyword.issoftkeyword("match"))  # -> True
-Gotcha — small integer and string caching. CPython pre-creates the ints -5..256 and interns some short strings. So is sometimes "works" for equality by accident:
 
-a = 256; b = 256
-print(a is b)     # -> True   (cached)
-a = 257; b = 257
-print(a is b)     # -> may be True in a script (compiler folds constants), False in the REPL
-Never use is to compare values. Use is only for None, True, False, and sentinel objects. Use == for values.
+print(keyword.kwlist)
+print(keyword.iskeyword("class"))  # True
+```
 
-Gotcha — the mutable alias trap. The single most common beginner bug:
+## 1.6 Common mistakes and useful details
 
-grid = [[0] * 3] * 3     # THREE REFERENCES TO ONE LIST
+### `is` versus `==`
+
+- `==` asks whether two values are equal.
+- `is` asks whether two names refer to the exact same object.
+
+```python
+a = [1, 2]
+b = [1, 2]
+
+print(a == b)  # True: same contents
+print(a is b)  # False: different list objects
+```
+
+Use `is` for identity checks, especially `value is None`. Use `==` to compare ordinary values.
+
+### A common mutable-list trap
+
+```python
+# Avoid this: each row refers to the same list
+grid = [[0] * 3] * 3
 grid[0][0] = 9
-print(grid)              # -> [[9, 0, 0], [9, 0, 0], [9, 0, 0]]
+print(grid)
+```
 
-grid = [[0] * 3 for _ in range(3)]   # correct: three distinct lists
+All three rows change because they are references to one inner list.
+
+Create separate rows with a comprehension:
+
+```python
+grid = [[0] * 3 for _ in range(3)]
 grid[0][0] = 9
-print(grid)              # -> [[9, 0, 0], [0, 0, 0], [0, 0, 0]]
-Gotcha — deleting a name. del x unbinds the name, it does not "free memory" directly. The object is collected when its last reference goes away.
+print(grid)
+```
 
+**Output**
+```text
+[[9, 0, 0], [0, 0, 0], [0, 0, 0]]
+```
+
+### `del` removes a name binding
+
+```python
 x = [1, 2]
 y = x
+
 del x
-print(y)      # -> [1, 2]   object still alive, y still references it
-print(x)      # !! NameError
-Interview note. "What's the difference between is and ==?" is the entry-level probe; the senior version is "explain what happens in memory when you write b = a for a list, and what b += [1] does versus b = b + [1]."
+print(y)  # [1, 2]
+```
 
-a = [1]; b = a
-b += [2]        # in-place extend -> mutates the shared list
-print(a)        # -> [1, 2]
+Deleting `x` does not delete the list while `y` still refers to it.
 
-a = [1]; b = a
-b = b + [2]     # builds a NEW list and rebinds b
-print(a)        # -> [1]
-The reason: += on a list calls __iadd__ (in-place), + calls __add__ (new object).
+### Deeper detail: `+=` and `+` with lists
 
-2. Numeric types and arithmetic operators
-The three built-in numeric types
-Type	Literal	Notes
-int	42, -7, 0, 1_000_000	Arbitrary precision — no overflow, limited only by RAM
-float	3.14, 1e-9, 2.0	IEEE-754 double, 64-bit, ~15–17 significant digits
-complex	3+4j, complex(3, 4)	Real + imaginary, both stored as floats
-big = 2 ** 1000
-print(len(str(big)))     # -> 302     digits. No overflow, ever.
+```python
+a = [1]
+b = a
+b += [2]
+print(a)  # [1, 2]
+```
 
-print(0.1 + 0.2)         # -> 0.30000000000000004    <- floats are binary approximations
-print(1e400)             # -> inf     floats DO overflow, to infinity
+For lists, `+=` usually updates the existing list. By contrast:
 
+```python
+a = [1]
+b = a
+b = b + [2]
+print(a)  # [1]
+```
+
+`+` creates a new list and rebinds `b`.
+
+---
+
+# 2. Numeric types and arithmetic
+
+## 2.1 The three built-in numeric types
+
+| Type | Example | What it represents |
+|---|---|---|
+| `int` | `42`, `-7`, `0` | Integers |
+| `float` | `3.14`, `2.0`, `1e-9` | Floating-point numbers |
+| `complex` | `3 + 4j` | Numbers with real and imaginary parts |
+
+Python integers can grow very large, limited mainly by available memory:
+
+```python
+big_number = 2 ** 1000
+print(len(str(big_number)))  # 302
+```
+
+Floats have finite precision and can overflow to infinity:
+
+```python
+print(0.1 + 0.2)  # 0.30000000000000004
+print(1e400)      # inf (on typical Python float implementations)
+```
+
+Complex numbers:
+
+```python
 z = 3 + 4j
-print(z.real, z.imag)    # -> 3.0 4.0
-print(abs(z))            # -> 5.0     magnitude
-print(z.conjugate())     # -> (3-4j)
-Integer literals in other bases, and readability underscores
-print(0b1010)      # -> 10    binary
-print(0o17)        # -> 15    octal
-print(0xff)        # -> 255   hex
-print(1_000_000)   # -> 1000000   underscores are ignored, just for humans
-print(int("ff", 16))  # -> 255   parse a string in a given base
-print(bin(10), oct(10), hex(10))  # -> 0b1010 0o12 0xa
-Arithmetic operators
-print(7 + 3)     # -> 10     addition
-print(7 - 3)     # -> 4      subtraction
-print(7 * 3)     # -> 21     multiplication
-print(7 / 3)     # -> 2.3333333333333335   TRUE division, ALWAYS returns float
-print(7 // 3)    # -> 2      FLOOR division (rounds toward -infinity)
-print(7 % 3)     # -> 1      modulo (remainder)
-print(7 ** 3)    # -> 343    exponentiation
-print(-7 // 3)   # -> -3     NOT -2!  floor(-2.333) == -3
-print(-7 % 3)    # -> 2      sign follows the DIVISOR in Python
-print(divmod(7, 3))   # -> (2, 1)   quotient and remainder in one call
-Precedence, highest first: ** → unary -x → * / // % → + -. Use parentheses when in doubt; they cost nothing.
 
-print(2 ** 3 ** 2)   # -> 512   ** is RIGHT-associative: 2 ** (3 ** 2) == 2 ** 9
-print(-2 ** 2)       # -> -4    ** binds tighter than unary minus: -(2 ** 2)
-print((-2) ** 2)     # -> 4
-Bitwise operators (integers)
-print(0b1100 & 0b1010)   # -> 8    (0b1000)  AND
-print(0b1100 | 0b1010)   # -> 14   (0b1110)  OR
-print(0b1100 ^ 0b1010)   # -> 6    (0b0110)  XOR
-print(~5)                # -> -6   NOT (two's complement: ~n == -n-1)
-print(1 << 4)            # -> 16   left shift  (multiply by 2**4)
-print(256 >> 4)          # -> 16   right shift (floor-divide by 2**4)
-Useful numeric built-ins and helpers
-print(abs(-4.5))        # -> 4.5
-print(round(2.675, 2))  # -> 2.67   <- NOT 2.68, see gotcha below
-print(round(2.5))       # -> 2      banker's rounding: ties go to EVEN
-print(round(3.5))       # -> 4
-print(pow(2, 10))       # -> 1024
-print(pow(2, 10, 1000)) # -> 24     (2**10) % 1000, computed efficiently
-print(min(3, 1, 2), max(3, 1, 2), sum([1, 2, 3]))   # -> 1 3 6
+print(z.real)        # 3.0
+print(z.imag)        # 4.0
+print(abs(z))        # 5.0
+print(z.conjugate()) # (3-4j)
+```
 
+## 2.2 Number bases and underscores
+
+Python supports binary, octal, and hexadecimal integer literals:
+
+```python
+print(0b1010)  # 10: binary
+print(0o17)    # 15: octal
+print(0xff)    # 255: hexadecimal
+```
+
+Underscores can make large numbers easier to read:
+
+```python
+population = 1_000_000
+print(population)  # 1000000
+```
+
+Convert an integer to a string in a chosen base:
+
+```python
+print(bin(10))  # 0b1010
+print(oct(10))  # 0o12
+print(hex(10))  # 0xa
+print(int("ff", 16))  # 255
+```
+
+## 2.3 Arithmetic operators
+
+| Operator | Meaning | Example | Result |
+|---|---|---:|---:|
+| `+` | Addition | `7 + 3` | `10` |
+| `-` | Subtraction | `7 - 3` | `4` |
+| `*` | Multiplication | `7 * 3` | `21` |
+| `/` | True division | `7 / 3` | `2.333...` |
+| `//` | Floor division | `7 // 3` | `2` |
+| `%` | Remainder | `7 % 3` | `1` |
+| `**` | Exponentiation | `7 ** 3` | `343` |
+
+Important: `/` returns a float. `//` rounds down toward negative infinity:
+
+```python
+print(7 / 3)    # 2.3333333333333335
+print(7 // 3)   # 2
+print(-7 // 3)  # -3
+print(-7 % 3)   # 2
+print(divmod(7, 3))  # (2, 1)
+```
+
+## 2.4 Operator precedence
+
+A simplified order, from higher to lower:
+
+1. Parentheses
+2. Exponentiation `**`
+3. Unary `+x` and `-x`
+4. `*`, `/`, `//`, `%`
+5. `+`, `-`
+
+When an expression is hard to read, use parentheses.
+
+```python
+print(2 ** 3 ** 2)  # 512: 2 ** (3 ** 2)
+print(-2 ** 2)      # -4: -(2 ** 2)
+print((-2) ** 2)    # 4
+```
+
+## 2.5 Useful built-in functions
+
+```python
+print(abs(-4.5))              # 4.5
+print(round(3.14159, 2))      # 3.14
+print(pow(2, 10))             # 1024
+print(min(3, 1, 2))           # 1
+print(max(3, 1, 2))           # 3
+print(sum([1, 2, 3]))         # 6
+```
+
+The `math` module provides more numeric tools:
+
+```python
 import math
-print(math.floor(-2.3), math.ceil(-2.3))   # -> -3 -2
-print(math.sqrt(16), math.isqrt(17))       # -> 4.0 4        isqrt is exact integer sqrt
-print(math.inf, -math.inf, math.nan)       # -> inf -inf nan
-print(math.isclose(0.1 + 0.2, 0.3))        # -> True   <- how to compare floats
-print(math.gcd(12, 18), math.lcm(4, 6))    # -> 6 12
-print(math.factorial(5))                   # -> 120
-Gotcha — floats are not decimals. 0.1 cannot be represented exactly in binary, the same way 1/3 cannot be written exactly in decimal.
 
-print(0.1 + 0.2 == 0.3)                  # -> False
-print(math.isclose(0.1 + 0.2, 0.3))      # -> True     <- do this instead
+print(math.floor(2.8))       # 2
+print(math.ceil(2.2))        # 3
+print(math.sqrt(16))         # 4.0
+print(math.isqrt(17))        # 4: integer square root
+print(math.gcd(12, 18))      # 6
+print(math.lcm(4, 6))        # 12
+print(math.factorial(5))     # 120
+print(math.isclose(0.1 + 0.2, 0.3))  # True
+```
+
+## 2.6 Floating-point precision
+
+A computer stores ordinary floats in binary. Many decimal fractions cannot be represented exactly.
+
+```python
+print(0.1 + 0.2)        # 0.30000000000000004
+print(0.1 + 0.2 == 0.3) # False
+```
+
+For approximate comparisons, use `math.isclose()`:
+
+```python
+import math
+
+print(math.isclose(0.1 + 0.2, 0.3))  # True
+```
+
+For decimal arithmetic such as money, use `Decimal` with strings:
+
+```python
 from decimal import Decimal
-print(Decimal("0.1") + Decimal("0.2"))   # -> Decimal('0.3')   <- or this, for money
-Never store money as float. Use decimal.Decimal or integer cents. (Tier 2 covers decimal and fractions properly.)
 
-Gotcha — round() does banker's rounding, not the "always round .5 up" you learned in school. round(0.5) == 0, round(1.5) == 2, round(2.5) == 2. This is deliberate: it avoids statistical bias when summing many rounded values. And round(2.675, 2) == 2.67 because 2.675 is actually stored as 2.67499999999999982....
+total = Decimal("0.1") + Decimal("0.2")
+print(total)  # 0.3
+```
 
-Gotcha — nan is not equal to itself.
+## 2.7 Understanding `round()`
 
-n = float("nan")
-print(n == n)             # -> False
-print(math.isnan(n))      # -> True    <- the correct test
-print([n] == [n])         # -> True    !! list comparison checks identity first
-Gotcha — bool is a subclass of int.
+Python's `round()` uses **ties-to-even** rounding for exact halfway cases:
 
-print(isinstance(True, int))   # -> True
-print(True + True)             # -> 2
-print(sum([True, False, True]))# -> 2      (a genuinely useful idiom for counting)
-Interview note. Expect: "Why is 0.1 + 0.2 != 0.3?" — answer with binary floating point and IEEE-754, then immediately name the fixes (math.isclose, Decimal, integer cents). A follow-up is often "how would you store currency in a database?" — integer minor units. Also common: "what does -7 // 3 give and why?" — floor semantics, and the invariant a == (a // b) * b + (a % b) holds for all ints.
+```python
+print(round(0.5))  # 0
+print(round(1.5))  # 2
+print(round(2.5))  # 2
+print(round(3.5))  # 4
+```
 
-3. Booleans, truthiness, short-circuit and/or
-The bool type
-print(True, False)              # -> True False
-print(type(True))               # -> <class 'bool'>
-print(int(True), int(False))    # -> 1 0
-Comparison operators produce booleans
-print(3 == 3.0)     # -> True    == compares VALUE (across numeric types)
-print(3 is 3.0)     # -> False   is compares IDENTITY (and gives a SyntaxWarning here)
-print(1 != 2)       # -> True
-print(1 < 2 < 3)    # -> True    CHAINED comparison: (1 < 2) and (2 < 3), 2 evaluated once
-print(1 < 2 > 0)    # -> True    legal but confusing; avoid
-Truthiness — what counts as false
-Every object can be used in a boolean context. These are falsy; everything else is truthy:
+Also, `round(2.675, 2)` can produce `2.67` because the stored float is slightly below the decimal value `2.675`.
 
-falsy = [False, None, 0, 0.0, 0j, "", [], (), {}, set(), frozenset(), range(0), b""]
-print(any(falsy))     # -> False    not one of them is truthy
-from decimal import Decimal
-print(bool(Decimal("0")))   # -> False
-An object controls its own truthiness via __bool__, falling back to __len__:
+For predictable decimal rounding:
 
-class Basket:
-    def __init__(self, items): self.items = items
-    def __len__(self): return len(self.items)
+```python
+from decimal import Decimal, ROUND_HALF_UP
 
-print(bool(Basket([])))       # -> False   (len == 0)
-print(bool(Basket(["a"])))    # -> True
-Idiomatic style:
+amount = Decimal("2.675")
+rounded = amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
+print(rounded)  # 2.68
+```
+
+## 2.8 Deeper numeric details
+
+Bitwise operators work on the binary representation of integers:
+
+| Operator | Meaning |
+|---|---|
+| `&` | Bitwise AND |
+| `|` | Bitwise OR |
+| `^` | Bitwise XOR |
+| `~` | Bitwise NOT |
+| `<<` | Left shift |
+| `>>` | Right shift |
+
+```python
+print(0b1100 & 0b1010)  # 8
+print(0b1100 | 0b1010)  # 14
+print(0b1100 ^ 0b1010)  # 6
+print(~5)               # -6
+print(1 << 4)           # 16
+print(256 >> 4)         # 16
+```
+
+Other details worth knowing later:
+
+```python
+import math
+
+number = float("nan")
+print(math.isnan(number))  # True
+print(number == number)    # False
+print(isinstance(True, int))  # True
+print(True + True)            # 2
+```
+
+`bool` is a subclass of `int`, although you should generally treat booleans as logical values.
+
+---
+
+# 3. Booleans and truthiness
+
+## 3.1 The `bool` type
+
+A Boolean represents one of two values: `True` or `False`.
+
+```python
+is_learning = True
+is_finished = False
+
+print(type(is_learning))  # <class 'bool'>
+print(int(True))          # 1
+print(int(False))         # 0
+```
+
+Comparison operators produce Boolean results:
+
+```python
+print(3 == 3.0)  # True
+print(1 != 2)    # True
+print(1 < 2)     # True
+print(1 < 2 < 3) # True
+```
+
+Use `==` for value equality. Use `is` for object identity.
+
+## 3.2 Truthy and falsy values
+
+Python allows many values in an `if` condition. Some values are **falsy**; most others are **truthy**.
+
+Common falsy values:
+
+```python
+False
+None
+0
+0.0
+0j
+""
+[]
+()
+{}
+set()
+```
+
+Examples:
+
+```python
+if "":
+    print("This will not run")
+
+if "Python":
+    print("This will run")
+```
+
+A Pythonic way to check whether a collection is empty:
+
+```python
 items = []
-if not items:            # GOOD — pythonic
-    print("empty")
-if len(items) == 0:      # ok, but noisier
-    ...
-if items == []:          # bad — breaks for tuples, sets, custom types
-    ...
-and / or short-circuit and return operands, not booleans
-This surprises people: and/or do not return True/False, they return one of the operands.
 
-print(1 and 2)          # -> 2      both truthy -> returns the LAST
-print(0 and 2)          # -> 0      first is falsy -> returns it, 2 never evaluated
-print(1 or 2)           # -> 1      first is truthy -> returns it, 2 never evaluated
-print(0 or 2)           # -> 2
-print(0 or "" or None or "found")   # -> 'found'   first truthy wins
-print(not 5)            # -> False  `not` DOES return a real bool
-Short-circuiting is a control-flow tool — the right side may never run:
+if not items:
+    print("The collection is empty")
+```
 
-def expensive():
-    print("ran!")
+This works for empty lists, tuples, dictionaries, sets, and other objects with a false Boolean value.
+
+## 3.3 `and`, `or`, and `not`
+
+- `and` returns the first falsy operand, or the last operand if all are truthy.
+- `or` returns the first truthy operand, or the last operand if all are falsy.
+- `not` always returns a Boolean.
+
+```python
+print(1 and 2)  # 2
+print(0 and 2)  # 0
+print(1 or 2)   # 1
+print(0 or 2)   # 2
+print(not 5)    # False
+```
+
+### Short-circuit evaluation
+
+Python may skip evaluating the right-hand side:
+
+```python
+def do_something():
+    print("Function called")
     return True
 
 flag = False
-if flag and expensive():   # expensive() never called
-    ...
 
-user = None
-name = user and user.name          # -> None, no AttributeError
-name = (user.name if user else "anonymous")
+if flag and do_something():
+    print("Inside if")
+```
 
-# guard against division by zero / index errors
-xs = []
-if xs and xs[0] > 0:               # xs[0] never evaluated when xs is empty
-    ...
-The or default-value idiom, and its trap:
+Nothing is printed because `flag` is false, so `do_something()` is not called.
 
+Short-circuiting can also protect an operation:
+
+```python
+numbers = []
+
+if numbers and numbers[0] > 0:
+    print("First number is positive")
+```
+
+Python never evaluates `numbers[0]` when the list is empty.
+
+## 3.4 A common default-value mistake
+
+This pattern is convenient:
+
+```python
 def greet(name=None):
-    name = name or "guest"      # convenient...
-    return f"hi {name}"
+    name = name or "Guest"
+    return f"Hello, {name}"
+```
 
-print(greet())        # -> hi guest
-print(greet(""))      # -> hi guest    <- "" is falsy, maybe you wanted the empty string
-print(greet("ali"))   # -> hi ali
+But it replaces every falsy value, including an empty string:
 
-def greet2(name=None):
-    if name is None:            # ...but this is precise
-        name = "guest"
-    return f"hi {name}"
-print(greet2(""))     # -> hi
-Gotcha — and/or vs &/|. and/or are boolean, lazy, and work on truthiness. &/| are bitwise, eager, and operate on values. On plain bools they look the same but have different precedence and no short-circuit.
+```python
+print(greet(""))  # Hello, Guest
+```
 
-print(True & False)        # -> False   (bitwise, but bools are ints)
-print(1 & 2)               # -> 0       !! bitwise AND of 01 and 10
-print(1 and 2)             # -> 2
-print(True | False)        # -> True
-# precedence trap: | binds TIGHTER than ==
-print(False == False | True)     # -> False   parses as False == (False | True)
-print((False == False) | True)   # -> True    what you probably meant
-(In pandas/NumPy you must use &/| on arrays, with parentheses — and raises there.)
+If only `None` should trigger the default, write:
 
-Gotcha — comparing to True/False explicitly.
+```python
+def greet(name=None):
+    if name is None:
+        name = "Guest"
+    return f"Hello, {name}"
+```
 
-x = 1
-print(x == True)      # -> True
-print(x is True)      # -> False   x is int 1, not bool True
-if x: ...             # <- just do this
-Linters flag == True for good reason.
+Now an empty string remains an empty string.
 
-Gotcha — chained comparison with in/is.
+## 3.5 `and`/`or` versus `&`/`|`
 
-print("a" in "abc" == True)   # -> False !  parses as ("a" in "abc") and ("abc" == True)
-Interview note. "What does x or y return?" separates people who memorised syntax from people who read the language reference. Follow-up: "implement a default helper that treats 0 and "" as valid values" — the answer is a None check or a unique sentinel:
+`and` and `or` are logical operators with short-circuit behavior. `&` and `|` are bitwise operators and do not short-circuit.
 
-_MISSING = object()          # unique sentinel, never equal to user data
-def get(d, key, default=_MISSING):
-    ...
-4. Strings
-str is an immutable sequence of Unicode code points.
+```python
+print(True and False)  # False
+print(True & False)    # False
 
-Creating strings
-s1 = 'single'
-s2 = "double"                      # identical; pick one style per project
-s3 = """multi
-line"""                            # keeps the newline
-s4 = 'He said "hi"'                # no escaping needed
-s5 = "It's fine"
-s6 = 'escaped \' quote and a \\ backslash and a \n newline and a \t tab'
-s7 = r"raw\nstring"                # r prefix: backslashes are literal -> raw\nstring
-s8 = f"formatted {1 + 1}"          # f-string -> 'formatted 2'
-s9 = b"bytes, not str"             # bytes literal (different type!)
-s10 = ("implicit "                 # adjacent literals concatenate at COMPILE time
-       "concatenation")            # -> 'implicit concatenation'
-print(len(s10))                    # -> 22
-Raw strings are what you want for regex and Windows paths:
+print(1 and 2)         # 2
+print(1 & 2)           # 0
+```
 
-import re
-print(re.findall(r"\d+", "a1b22"))   # -> ['1', '22']    r"" keeps \d intact
-Indexing and slicing
-s = "Python"
-#    012345      forward index
-#   -654321      negative index
+For normal conditions, use `and`, `or`, and `not`.
 
-print(s[0])       # -> 'P'
-print(s[-1])      # -> 'n'      last character
-print(s[1:4])     # -> 'yth'    [start:stop) — stop is EXCLUSIVE
-print(s[:3])      # -> 'Pyt'    start defaults to 0
-print(s[3:])      # -> 'hon'    stop defaults to len
-print(s[:])       # -> 'Python' full copy
-print(s[::2])     # -> 'Pto'    step 2
-print(s[::-1])    # -> 'nohtyP' reversed
-print(s[10:20])   # -> ''       out-of-range SLICES are safe (no error)
-print(s[10])      # !! IndexError: string index out of range
-Concatenation and repetition
-print("ab" + "cd")     # -> 'abcd'
-print("ab" * 3)        # -> 'ababab'
-print("-" * 20)        # -> '--------------------'   handy separator
-print("".join(["a", "b", "c"]))         # -> 'abc'
-print(", ".join(["a", "b", "c"]))       # -> 'a, b, c'
-Building a string in a loop with += is O(n²) in general. Collect into a list and join:
+---
 
+# 4. Strings
+
+## 4.1 What is a string?
+
+A string (`str`) is an immutable sequence of text characters represented as Unicode code points.
+
+```python
+single = 'Hello'
+double = "Python"
+multiline = """This is
+a multiline string."""
+
+print(single)
+print(double)
+print(multiline)
+```
+
+Single and double quotes work the same way. Choose a consistent style.
+
+## 4.2 Useful string forms
+
+```python
+message = "It's fine"
+quote = 'She said "hello"'
+
+escaped = "First line\nSecond line"
+raw = r"C:\new\table"
+formatted = f"Two plus two is {2 + 2}"
+
+print(escaped)
+print(raw)
+print(formatted)
+```
+
+- `\n` means newline.
+- `\t` means tab.
+- `r"..."` creates a raw string, useful for regular expressions and Windows paths.
+- `f"..."` creates a formatted string.
+
+Bytes (`bytes`) are different from strings:
+
+```python
+text = "hello"
+data = b"hello"
+
+print(type(text))  # <class 'str'>
+print(type(data))  # <class 'bytes'>
+```
+
+## 4.3 Indexing and slicing
+
+Python strings use zero-based indexing.
+
+```python
+word = "Python"
+#       012345
+
+print(word[0])    # P
+print(word[-1])   # n
+print(word[1:4])  # yth
+print(word[:3])   # Pyt
+print(word[3:])   # hon
+print(word[::2])  # Pto
+print(word[::-1]) # nohtyP
+```
+
+The stop position in a slice is **exclusive**: `word[1:4]` includes indexes 1, 2, and 3.
+
+An out-of-range index raises `IndexError`, but an out-of-range slice is safe:
+
+```python
+print(word[10:20])  # ""
+# print(word[10])   # IndexError
+```
+
+## 4.4 Joining and concatenating strings
+
+```python
+print("Hello" + " " + "Python")  # Hello Python
+print("ha" * 3)                  # hahaha
+
+letters = ["a", "b", "c"]
+print("".join(letters))          # abc
+print(", ".join(letters))        # a, b, c
+```
+
+When building a large string in a loop, collect pieces in a list and join them:
+
+```python
 parts = []
-for i in range(5):
-    parts.append(str(i))
-print("".join(parts))    # -> '01234'
-Essential string methods
-Every one of these returns a new string — strings are immutable.
 
-s = "  Hello, World  "
+for number in range(5):
+    parts.append(str(number))
 
-# case
-print(s.upper())            # -> '  HELLO, WORLD  '
-print(s.lower())            # -> '  hello, world  '
-print("hi there".title())   # -> 'Hi There'
-print("hi there".capitalize())  # -> 'Hi there'
-print("AbC".swapcase())     # -> 'aBc'
-print("Straße".casefold())  # -> 'strasse'   aggressive lowercase for comparisons
+result = "".join(parts)
+print(result)  # 01234
+```
 
-# whitespace / trimming
-print(s.strip())            # -> 'Hello, World'
-print(s.lstrip(), "|")      # -> 'Hello, World  |'
-print(s.rstrip(), "|")      # -> '  Hello, World|'
-print("xxhixx".strip("x"))  # -> 'hi'      strips any of the CHARACTERS given
-print("file.txt".removesuffix(".txt"))    # -> 'file'   (3.9+, use this not strip!)
-print("pre_name".removeprefix("pre_"))    # -> 'name'
+## 4.5 Essential string methods
 
-# searching
-print("hello".find("l"))     # -> 2     first index, -1 if absent
-print("hello".rfind("l"))    # -> 3     last index
-print("hello".index("l"))    # -> 2     like find but RAISES ValueError if absent
-print("hello".count("l"))    # -> 2
-print("hello".startswith("he"))          # -> True
-print("hello".endswith((".py", ".txt"))) # -> False   accepts a TUPLE of options
-print("ell" in "hello")      # -> True   simplest membership test
+String methods return new strings because strings are immutable.
 
-# splitting and joining
-print("a,b,c".split(","))          # -> ['a', 'b', 'c']
-print("a b  c".split())            # -> ['a', 'b', 'c']  no-arg split collapses whitespace
-print("a,b,c".split(",", 1))       # -> ['a', 'b,c']     maxsplit
-print("a,b,c".rsplit(",", 1))      # -> ['a,b', 'c']     from the right
-print("k=v=w".partition("="))      # -> ('k', '=', 'v=w')  always a 3-tuple
-print("line1\nline2".splitlines()) # -> ['line1', 'line2']
+### Changing letter case
 
-# replacing
-print("a-b-c".replace("-", "+"))       # -> 'a+b+c'
-print("a-b-c".replace("-", "+", 1))    # -> 'a+b-c'   count limit
+```python
+text = "Hello, World"
 
-# padding / alignment
-print("5".zfill(3))          # -> '005'
-print("hi".ljust(5, "."))    # -> 'hi...'
-print("hi".rjust(5, "."))    # -> '...hi'
-print("hi".center(6, "*"))   # -> '**hi**'
+print(text.upper())       # HELLO, WORLD
+print(text.lower())       # hello, world
+print(text.title())       # Hello, World
+print(text.capitalize())  # Hello, world
+print("AbC".swapcase())   # aBc
+print("Straße".casefold()) # strasse
+```
 
-# classification (all return bool; all are False for the empty string)
-print("abc".isalpha(), "123".isdigit(), "a1".isalnum())   # -> True True True
-print("  ".isspace(), "Hi".istitle(), "ABC".isupper())    # -> True True True
-print("var_1".isidentifier())      # -> True
-f-strings (preview — full coverage in Tier 2)
-name, score = "Ada", 0.87561
-print(f"{name} scored {score:.1%}")     # -> Ada scored 87.6%
-print(f"{name!r}")                      # -> 'Ada'      !r calls repr()
-print(f"{score=}")                      # -> score=0.87561   self-documenting (3.8+)
-print(f"{42:>8}|")                      # -> '      42|'  right-align in 8 columns
-print(f"{1234567:,}")                   # -> 1,234,567
-Gotcha — strings are immutable.
+### Removing whitespace or prefixes/suffixes
 
-s = "hello"
-s[0] = "H"          # !! TypeError: 'str' object does not support item assignment
-s = "H" + s[1:]     # correct: build a new string
-Gotcha — strip() is not removesuffix(). strip takes a set of characters:
+```python
+text = "  Hello  "
 
-print("test.txt".strip(".txt"))       # -> 'es'   !!  stripped t, x, . from BOTH ends
-print("test.txt".removesuffix(".txt"))# -> 'test'  correct
-This is a real bug that ships to production regularly.
+print(text.strip())   # "Hello"
+print(text.lstrip())  # "Hello  "
+print(text.rstrip())  # "  Hello"
 
-Gotcha — len() counts code points, not visible characters.
+print("file.txt".removesuffix(".txt"))  # file
+print("pre_name".removeprefix("pre_"))  # name
+```
 
-print(len("café"))          # -> 4
-print(len("cafe\u0301"))    # -> 5   same-looking text, combining accent
-print(len("👍"))            # -> 1
-print(len("👨‍👩‍👧"))          # -> 5   one emoji, five code points (ZWJ sequence)
-Normalise before comparing user text: unicodedata.normalize("NFC", s). Tier 2 goes deeper.
+**Important:** `strip(chars)` removes any matching characters from the ends; it does not remove an exact substring.
 
-Interview note. "How would you reverse a string?" → s[::-1]. "Why is repeated += in a loop bad?" → strings are immutable, each += allocates and copies, O(n²) total; use str.join. (CPython has an in-place optimisation when the refcount is 1, but never rely on it — it vanishes the moment the string has another reference.)
+```python
+print("test.txt".strip(".txt"))        # "es" — surprising!
+print("test.txt".removesuffix(".txt")) # "test" — intended result
+```
 
-5. None and its role
-None is the single instance of NoneType. It means "no value here" — not zero, not empty.
+### Searching and checking
 
-x = None
-print(x)                 # -> None
-print(type(None))        # -> <class 'NoneType'>
-print(None is None)      # -> True
-print(bool(None))        # -> False
+```python
+text = "hello"
 
-# It's a SINGLETON: there is exactly one None object in the whole process.
-print(None is None)      # -> True, always
-Where None shows up
-# 1. Functions with no explicit return
-def f():
-    pass
-print(f())               # -> None
+print(text.find("l"))       # 2; -1 if not found
+print(text.rfind("l"))      # 3; search from the right
+print(text.index("e"))      # 1; raises ValueError if not found
+print(text.count("l"))      # 2
+print(text.startswith("he")) # True
+print(text.endswith("lo"))   # True
+print("ell" in text)         # True
+```
 
-# 2. Mutating methods return None (they changed the object in place)
-xs = [3, 1, 2]
-print(xs.sort())         # -> None      <- classic bug source
-xs.sort()
-print(xs)                # -> [1, 2, 3]
-print(sorted([3, 1, 2])) # -> [1, 2, 3] sorted() RETURNS a new list
+### Splitting and partitioning
 
-# 3. Default "nothing was supplied" marker
+```python
+print("a,b,c".split(","))       # ['a', 'b', 'c']
+print("a b  c".split())         # ['a', 'b', 'c']
+print("a,b,c".split(",", 1))    # ['a', 'b,c']
+print("a,b,c".rsplit(",", 1))   # ['a,b', 'c']
+print("key=value".partition("=")) # ('key', '=', 'value')
+print("one\ntwo".splitlines())  # ['one', 'two']
+```
+
+`split()` separates text into a list. `partition()` always returns a three-item tuple: the part before the separator, the separator, and the part after it.
+
+### Replacing and aligning
+
+```python
+print("a-b-c".replace("-", "+"))     # a+b+c
+print("a-b-c".replace("-", "+", 1))  # a+b-c
+
+print("5".zfill(3))       # 005
+print("hi".ljust(5, ".")) # hi...
+print("hi".rjust(5, ".")) # ...hi
+print("hi".center(6, "*")) # **hi**
+```
+
+### Checking string contents
+
+```python
+print("abc".isalpha())       # True
+print("123".isdigit())       # True
+print("a1".isalnum())        # True
+print("  ".isspace())        # True
+print("Hello".istitle())     # True
+print("ABC".isupper())       # True
+print("var_1".isidentifier()) # True
+```
+
+These checks return `False` for an empty string.
+
+## 4.6 F-strings
+
+F-strings are a readable way to insert values into strings:
+
+```python
+name = "Ada"
+score = 0.87561
+
+print(f"{name} scored {score:.1%}")  # Ada scored 87.6%
+print(f"{name!r}")                   # 'Ada'
+print(f"{score=}")                   # score=0.87561
+print(f"{42:>8}|")                   #       42|
+print(f"{1234567:,}")                # 1,234,567
+```
+
+- `:.1%` formats a number as a percentage with one decimal place.
+- `!r` uses `repr()`.
+- `:>8` right-aligns within eight spaces.
+- `:,` adds thousands separators.
+
+## 4.7 String gotchas
+
+Strings cannot be changed in place:
+
+```python
+text = "hello"
+# text[0] = "H"  # TypeError
+
+text = "H" + text[1:]
+print(text)  # Hello
+```
+
+`len()` counts Unicode code points, not necessarily user-perceived characters:
+
+```python
+print(len("café"))  # 4
+print(len("👍"))    # 1
+```
+
+Some emoji and accented characters are made from multiple code points. Unicode normalization may be needed when comparing user-entered text.
+
+---
+
+# 5. The `None` value
+
+## 5.1 What is `None`?
+
+`None` represents the absence of a value. It is not the same as `0`, `False`, or an empty string.
+
+```python
+result = None
+
+print(result)       # None
+print(type(result)) # <class 'NoneType'>
+print(result is None) # True
+print(bool(result)) # False
+```
+
+There is only one `None` object, so use `is` and `is not` to check for it.
+
+## 5.2 Where does `None` appear?
+
+### A function with no explicit return
+
+```python
+def say_hello():
+    print("Hello")
+
+result = say_hello()
+print(result)  # None
+```
+
+The function prints a message but does not return a value.
+
+### Methods that modify an object
+
+```python
+numbers = [3, 1, 2]
+
+result = numbers.sort()
+print(result)   # None
+print(numbers)  # [1, 2, 3]
+```
+
+`list.sort()` changes the existing list. `sorted()` returns a new sorted list:
+
+```python
+print(sorted([3, 1, 2]))  # [1, 2, 3]
+```
+
+### Optional arguments and dictionary lookups
+
+```python
 def connect(timeout=None):
     if timeout is None:
-        timeout = 30      # compute a real default at call time
+        timeout = 30
     return timeout
 
-# 4. Safe dict lookup
 config = {"host": "localhost"}
-print(config.get("port"))        # -> None
-print(config.get("port", 8080))  # -> 8080
-Always test with is / is not
-x = None
-if x is None: ...        # correct
-if x is not None: ...    # correct
-if x == None: ...        # works, but slower and overridable by __eq__; linters flag it
-if not x: ...            # WRONG when 0, "", [] are valid values
-Why it matters:
 
-class Weird:
-    def __eq__(self, other): return True
+print(config.get("port"))       # None
+print(config.get("port", 8080)) # 8080
+```
 
-print(Weird() == None)     # -> True   !! __eq__ lied
-print(Weird() is None)     # -> False  identity cannot be faked
-Gotcha — the mutable default argument. The most famous Python trap, and the reason None is used as a default everywhere:
+## 5.3 Correctly checking for `None`
 
-def add(item, bucket=[]):        # BROKEN: the list is created ONCE, at def time
+```python
+value = None
+
+if value is None:
+    print("No value supplied")
+
+if value is not None:
+    print("A value is available")
+```
+
+Avoid `if not value` when `0`, `""`, or `[]` might be valid values. Those are falsy too.
+
+## 5.4 The mutable default argument trap
+
+Default argument values are evaluated once when the function is defined—not every time it is called.
+
+**Problematic version:**
+
+```python
+def add_item(item, bucket=[]):
     bucket.append(item)
     return bucket
-print(add(1))     # -> [1]
-print(add(2))     # -> [1, 2]    !! shared across calls
 
-def add(item, bucket=None):      # CORRECT
+print(add_item("apple"))  # ['apple']
+print(add_item("pear"))   # ['apple', 'pear']
+```
+
+The same list is reused between calls.
+
+**Safer version:**
+
+```python
+def add_item(item, bucket=None):
     if bucket is None:
         bucket = []
+
     bucket.append(item)
     return bucket
-print(add(1))     # -> [1]
-print(add(2))     # -> [2]
-Gotcha — forgetting return.
 
-def double(x):
-    x * 2            # computed and thrown away
-print(double(5))     # -> None
-Interview note. Two near-certain questions: (1) "Why is None and not == None?" — None is a singleton, is is an identity check that can't be overridden and is faster; (2) "Explain the mutable default argument." Bonus points for naming the why: default values are evaluated once when the def statement executes and stored on the function object at func.__defaults__.
+print(add_item("apple"))  # ['apple']
+print(add_item("pear"))   # ['pear']
+```
 
-def f(a=[]): pass
-print(f.__defaults__)   # -> ([],)   the actual shared object
-6. Type conversion / casting
-Python does not auto-convert between unrelated types. You convert explicitly by calling the type.
+## 5.5 Remember to return a result
 
-# to int
-print(int("42"))         # -> 42
-print(int("  42  "))     # -> 42     surrounding whitespace is fine
-print(int("0x1f", 16))   # -> 31     explicit base
-print(int(3.99))         # -> 3      TRUNCATES toward zero, does not round
-print(int(-3.99))        # -> -3
-print(int(True))         # -> 1
-print(int("3.0"))        # !! ValueError: invalid literal for int() with base 10: '3.0'
-print(int(float("3.0"))) # -> 3      two-step for numeric strings with a decimal point
+```python
+def double(number):
+    number * 2  # The result is calculated but not returned
 
-# to float
-print(float("3.14"))     # -> 3.14
-print(float(7))          # -> 7.0
-print(float("inf"))      # -> inf
-print(float("1e-3"))     # -> 0.001
+print(double(5))  # None
+```
 
-# to str
-print(str(42))           # -> '42'
-print(str([1, 2]))       # -> '[1, 2]'
-print(str(None))         # -> 'None'
+Correct version:
 
-# to bool
-print(bool(0), bool(""), bool([]))       # -> False False False
-print(bool("False"))     # -> True   !! any non-empty string is truthy
+```python
+def double(number):
+    return number * 2
 
-# to the container types
-print(list("abc"))               # -> ['a', 'b', 'c']
-print(tuple([1, 2]))             # -> (1, 2)
-print(set([1, 1, 2]))            # -> {1, 2}
-print(dict([("a", 1), ("b", 2)]))# -> {'a': 1, 'b': 2}
-print(list({"a": 1}))            # -> ['a']   iterating a dict gives KEYS
-print(list({"a": 1}.items()))    # -> [('a', 1)]
+print(double(5))  # 10
+```
 
-# to bytes / from bytes
-print("héllo".encode("utf-8"))          # -> b'h\xc3\xa9llo'
-print(b"h\xc3\xa9llo".decode("utf-8"))  # -> 'héllo'
-Implicit conversion that does happen: numeric promotion
-print(1 + 2.0)          # -> 3.0     int promoted to float
-print(type(1 + 2.0))    # -> <class 'float'>
-print(True + 1.5)       # -> 2.5     bool -> int -> float
-print((1 + 2j) + 3)     # -> (4+2j)
-# The ladder: bool -> int -> float -> complex
-Checking types
-x = 5
-print(type(x) is int)         # -> True   exact type, no subclasses
-print(isinstance(x, int))     # -> True   type OR subclass — prefer this
-print(isinstance(x, (int, float)))   # -> True   accepts a tuple
-print(isinstance(True, int))  # -> True   because bool subclasses int
+`print()` displays something. `return` sends a value back to the caller.
 
-# Duck typing is usually better than type checking:
+---
+
+# 6. Type conversion and type checking
+
+## 6.1 Explicit type conversion
+
+Python provides built-in functions to convert values.
+
+### Convert to `int`
+
+```python
+print(int("42"))       # 42
+print(int("  42  "))   # 42
+print(int(3.99))       # 3
+print(int(-3.99))      # -3
+print(int(True))       # 1
+```
+
+`int()` truncates a float toward zero; it does not round.
+
+A string containing a decimal point cannot be converted directly to an integer:
+
+```python
+# int("3.0")  # ValueError
+print(int(float("3.0")))  # 3
+```
+
+### Convert to `float`
+
+```python
+print(float("3.14"))  # 3.14
+print(float(7))       # 7.0
+print(float("1e-3"))  # 0.001
+```
+
+### Convert to `str`
+
+```python
+print(str(42))       # '42'
+print(str([1, 2]))   # '[1, 2]'
+print(str(None))     # 'None'
+```
+
+### Convert to `bool`
+
+```python
+print(bool(0))       # False
+print(bool(""))      # False
+print(bool([]))      # False
+print(bool("False")) # True
+```
+
+A non-empty string is truthy—even if its contents spell `"False"`.
+
+### Convert to collection types
+
+```python
+print(list("abc"))              # ['a', 'b', 'c']
+print(tuple([1, 2]))            # (1, 2)
+print(set([1, 1, 2]))           # {1, 2}
+print(dict([("a", 1), ("b", 2)])) # {'a': 1, 'b': 2}
+```
+
+Iterating over a dictionary gives its keys:
+
+```python
+data = {"name": "Ada", "age": 30}
+
+print(list(data))         # ['name', 'age']
+print(list(data.items())) # [('name', 'Ada'), ('age', 30)]
+```
+
+## 6.2 Converting between strings and bytes
+
+Text is encoded into bytes and decoded back into text:
+
+```python
+text = "héllo"
+
+encoded = text.encode("utf-8")
+print(encoded)
+
+decoded = encoded.decode("utf-8")
+print(decoded)
+```
+
+Use the same compatible encoding when decoding data.
+
+## 6.3 Implicit numeric conversion
+
+Python sometimes promotes numeric values to a wider numeric type:
+
+```python
+print(1 + 2.0)       # 3.0
+print(True + 1.5)    # 2.5
+print((1 + 2j) + 3)  # (4+2j)
+```
+
+A simplified promotion order is:
+
+`bool → int → float → complex`
+
+## 6.4 Checking types
+
+Use `type()` to inspect an object's exact type:
+
+```python
+value = 5
+print(type(value))  # <class 'int'>
+```
+
+Use `isinstance()` when checking whether a value belongs to a type or its subclasses:
+
+```python
+print(isinstance(5, int))             # True
+print(isinstance(5, (int, float)))    # True
+print(isinstance(True, int))          # True
+```
+
+Usually, `isinstance()` is preferable to comparing `type(value)` directly.
+
+Python code often uses **duck typing**: instead of asking exactly what type an object is, it tries to use the behavior it needs.
+
+```python
 def total(values):
-    return sum(values)        # works for any iterable of numbers
+    return sum(values)
 
-# When you must check "is it a sequence / iterable":
-from collections.abc import Iterable, Sequence, Mapping
-print(isinstance([1], Iterable), isinstance("s", Sequence), isinstance({}, Mapping))
-# -> True True True
-Safe conversion pattern
+print(total([1, 2, 3]))  # 6
+print(total((4, 5)))     # 9
+```
+
+## 6.5 Handling conversion errors
+
+Conversion can fail. Use `try` and `except` when invalid input is expected:
+
+```python
 def to_int(value, default=None):
     try:
         return int(value)
     except (TypeError, ValueError):
         return default
 
-print(to_int("42"))      # -> 42
-print(to_int("abc"))     # -> None
-print(to_int(None, 0))   # -> 0
-Gotcha — int() truncates, it does not round. int(2.9) == 2, int(-2.9) == -2. For rounding use round(); for floor use math.floor() (they differ on negatives).
+print(to_int("42"))      # 42
+print(to_int("hello"))   # None
+print(to_int(None, 0))   # 0
+```
 
-Gotcha — bool("False") is True. Parsing config strings needs an explicit map:
+## 6.6 `str()` versus `repr()`
 
-def parse_bool(s):
-    return s.strip().lower() in {"1", "true", "yes", "on"}
-print(parse_bool("False"))   # -> False
-Gotcha — str() vs repr(). str() is for humans, repr() is for developers and should ideally be valid Python.
+- `str()` aims to produce readable text for people.
+- `repr()` aims to produce an unambiguous representation useful to developers.
 
-import datetime as dt
-d = dt.date(2026, 1, 1)
-print(str(d))    # -> 2026-01-01
-print(repr(d))   # -> datetime.date(2026, 1, 1)
-print(str("a"), repr("a"))   # -> a 'a'
-Interview note. "How do you check a type in Python?" — the answer they want is "usually you don't; you use duck typing / protocols; when you must, isinstance, not type() ==, because isinstance respects subclasses and ABC registration." Mention isinstance(True, int) is True as the classic edge case.
+```python
+print(str("hello"))   # hello
+print(repr("hello"))  # 'hello'
+```
 
-7. Comments and docstrings
-Comments
-# A full-line comment. Explain WHY, not WHAT.
+---
 
-x = x + 1            # inline comment: two spaces before #, one space after
+# 7. Comments and docstrings
 
-# BAD:  x = x + 1    # add one to x        <- restates the code
-# GOOD: x = x + 1    # compensate for the exclusive upper bound of range()
+## 7.1 Comments
 
-# Python has no /* block comment */ syntax.
-# Editors comment multiple lines by prefixing each with #.
+Comments explain code to people reading it. Prefer explaining **why** something is done when the reason is not obvious.
 
-"""
-A bare string literal like this is NOT a comment — it is an expression statement
-that creates and discards a string. Sometimes used to disable a block, but it
-still gets compiled. Prefer # for commenting out code.
-"""
-Docstrings
-A docstring is a string literal as the first statement of a module, function, class, or method. It becomes __doc__ and is what help() shows.
+```python
+# Compensate for range() excluding its stop value.
+last_index = len(items) - 1
+```
 
+Avoid comments that simply repeat the code:
+
+```python
+# Not very useful:
+count = count + 1  # Add one to count
+```
+
+Python uses `#` for comments. It does not have a special `/* ... */` block-comment syntax.
+
+## 7.2 What is a docstring?
+
+A docstring is a string literal placed as the first statement in a module, function, class, or method. Python stores it in the object's `__doc__` attribute. Tools such as `help()` can display it.
+
+```python
+def greet(name):
+    """Return a friendly greeting."""
+    return f"Hello, {name}!"
+
+print(greet.__doc__)
+help(greet)
+```
+
+## 7.3 Writing a useful docstring
+
+A common format is Google style:
+
+```python
 def clamp(value, low, high):
-    """Return value constrained to the inclusive range [low, high].
+    """Return value limited to the inclusive range from low to high.
 
     Args:
-        value: The number to clamp.
-        low: Lower bound, inclusive.
-        high: Upper bound, inclusive.
+        value: The number to limit.
+        low: The lower boundary.
+        high: The upper boundary.
 
     Returns:
-        low if value < low, high if value > high, otherwise value.
+        The limited value.
 
     Raises:
-        ValueError: If low > high.
+        ValueError: If low is greater than high.
 
     Examples:
         >>> clamp(5, 0, 10)
@@ -612,50 +1217,241 @@ def clamp(value, low, high):
     """
     if low > high:
         raise ValueError("low must not exceed high")
+
     return max(low, min(value, high))
+```
 
-print(clamp.__doc__.splitlines()[0])
-# -> Return value constrained to the inclusive range [low, high].
-help(clamp)      # renders the full docstring
-Module and class docstrings:
+A good docstring should explain:
 
-"""Utilities for geometry.
+- What the function does.
+- What arguments it expects.
+- What it returns.
+- Which errors it may raise.
+- Examples, when they make usage clearer.
 
-This module-level docstring must be the very first statement in the file,
-before any imports.
-"""
+## 7.4 Docstring conventions
 
-class Circle:
-    """A circle in the plane.
+- Use triple double quotes: `"""..."""`.
+- Put the docstring immediately after the `def`, `class`, or module declaration.
+- Start with a short summary.
+- For a longer docstring, leave a blank line after the summary.
+- Keep the description accurate as the code changes.
 
-    Attributes:
-        radius: Distance from centre to edge, in metres.
+This is a docstring:
+
+```python
+def add(a, b):
+    """Return the sum of a and b."""
+    return a + b
+```
+
+This is not a docstring because another statement comes first:
+
+```python
+def add(a, b):
+    result = a + b
+    """This is just a string expression, not the function docstring."""
+    return result
+```
+
+## 7.5 Testing examples with doctest
+
+Doctest can execute examples written in a docstring and compare the actual output with the expected output.
+
+Save this in `example.py`:
+
+```python
+def add(a, b):
+    """Return the sum of two numbers.
+
+    Examples:
+        >>> add(2, 3)
+        5
+        >>> add(10, 5)
+        15
     """
+    return a + b
+```
 
-    def area(self):
-        """Return the area in square metres."""
-        ...
-PEP 257 conventions
-Use """triple double quotes""" even for one-liners.
-One-liners: fit on one line, end with a period, no blank line before or after.
-Multi-line: summary line, blank line, details, closing """ on its own line.
-Write it as a command ("Return the area"), not a description ("Returns the area") — though Google-style docs commonly use the latter; be consistent with your project.
-Docstrings are testable
-# save as clamp.py, then run:  python -m doctest clamp.py -v
-# Any `>>>` example in a docstring is executed and its output compared.
-Popular docstring styles — pick one per project:
+Run it from the directory containing the file:
 
-Style	Looks like	Used by
-Google	Args: / Returns:	most modern projects, very readable
-NumPy	Parameters\n----------	scientific stack
-reST / Sphinx	:param x: / :returns:	older Sphinx projects
-Gotcha — a docstring must be the first statement. This is not a docstring:
+```powershell
+py -m doctest -v example.py
+```
 
-def f():
-    x = 1
-    """not a docstring"""     # just a discarded string; f.__doc__ is None
-Gotcha — python -O does not strip docstrings (that was -OO), and -OO will break any library that reads __doc__ at runtime (some CLI frameworks do).
+If the actual output matches the expected output, the test passes.
 
-Gotcha — backslashes in docstrings. A docstring containing \n or a Windows path needs a raw docstring: r"""Handles C:\new\table."""
+Doctest is useful for small examples and documentation. Larger projects often use tools such as `unittest` or `pytest`.
 
-Interview note. Low-frequency as a direct question, but code-review-visible. The senior signal is knowing that docstrings are runtime objects (__doc__), that help(), Sphinx, IDE tooltips and doctest all read them, and that comments should carry the rationale the code cannot.
+## 7.6 Other docstring styles
+
+| Style | Common structure |
+|---|---|
+| Google | `Args:`, `Returns:`, `Raises:` |
+| NumPy | `Parameters` with underlined headings |
+| reStructuredText / Sphinx | `:param name:`, `:returns:` |
+
+Pick one style and use it consistently in a project.
+
+---
+
+# 8. Practice exercises
+
+Try these without looking at the solutions first. Run your code and check the result.
+
+## Exercise 1 — Variables
+
+What does this code print?
+
+```python
+x = 10
+y = x
+x = 20
+
+print(y)
+```
+
+## Exercise 2 — Shared lists
+
+Predict the output:
+
+```python
+first = [1, 2]
+second = first
+second.append(3)
+
+print(first)
+```
+
+## Exercise 3 — Arithmetic
+
+What are the results of these expressions?
+
+```python
+print(7 / 2)
+print(7 // 2)
+print(-7 // 2)
+print(7 % 2)
+```
+
+## Exercise 4 — Truthiness
+
+Which of these values are falsy?
+
+```python
+values = [0, 1, "", "0", [], [0], None, False]
+
+for value in values:
+    print(repr(value), bool(value))
+```
+
+## Exercise 5 — Strings
+
+Given:
+
+```python
+path = "/home/user/report.final.txt"
+```
+
+Extract the filename and extension so the result is:
+
+```python
+("report.final", ".txt")
+```
+
+Hint: Try `rsplit()`.
+
+## Exercise 6 — `None` and return
+
+What does this function return?
+
+```python
+def multiply(a, b):
+    print(a * b)
+
+result = multiply(3, 4)
+print(result)
+```
+
+How would you change it so `result` contains `12`?
+
+## Exercise 7 — Type conversion
+
+Why does this work, but the next line fail?
+
+```python
+print(int("42"))
+print(int("4.2"))
+```
+
+## Exercise 8 — Docstrings
+
+Write a documented function called `is_even(number)` that:
+
+- Accepts an integer.
+- Returns `True` if it is even.
+- Returns `False` otherwise.
+- Includes at least two doctest examples.
+
+Run your tests with:
+
+```powershell
+py -m doctest -v your_file.py
+```
+
+---
+
+# 9. Quick reference
+
+## Core operators
+
+| Purpose | Syntax |
+|---|---|
+| Assignment | `=` |
+| Equality | `==` |
+| Not equal | `!=` |
+| Identity | `is`, `is not` |
+| Addition / subtraction | `+`, `-` |
+| Multiplication / division | `*`, `/` |
+| Floor division / remainder | `//`, `%` |
+| Exponentiation | `**` |
+| Logical operators | `and`, `or`, `not` |
+| Membership | `in`, `not in` |
+
+## Useful built-ins
+
+| Function | Purpose |
+|---|---|
+| `print()` | Display output |
+| `type()` | Inspect an object's type |
+| `isinstance()` | Check type or subclass |
+| `id()` | Inspect object identity |
+| `len()` | Get the number of items |
+| `int()` | Convert to integer |
+| `float()` | Convert to float |
+| `str()` | Convert to string |
+| `bool()` | Convert to Boolean |
+| `round()` | Round a number |
+| `abs()` | Absolute value |
+| `sum()` | Add values |
+| `min()` / `max()` | Find smallest / largest |
+| `help()` | Display documentation |
+
+## Before moving on
+
+You should be comfortable with:
+
+- [ ] Creating variables and assigning values.
+- [ ] Understanding that names refer to objects.
+- [ ] Recognizing `int`, `float`, `complex`, `bool`, `str`, and `None`.
+- [ ] Using arithmetic and comparison operators.
+- [ ] Understanding truthy and falsy values.
+- [ ] Indexing, slicing, and using common string methods.
+- [ ] Converting between common types.
+- [ ] Explaining the difference between `print()` and `return`.
+- [ ] Writing a simple function docstring.
+- [ ] Running a basic doctest.
+
+---
+
+**Keep practising:** You do not need to memorize every advanced detail on the first read. Focus on understanding the core concepts, writing small programs, and learning from the mistakes you encounter.
