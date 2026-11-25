@@ -13,6 +13,7 @@ print(a, b, c)
 
 **3. Truthiness. Write first_truthy(*values) returning the first truthy argument, or None if there is none. Do it in one line.**
 
+
 **4. Safe default. Write coalesce(*values) that returns the first argument that is not None (so 0 and "" are valid results).**
 
 
