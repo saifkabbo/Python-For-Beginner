@@ -1,8 +1,7 @@
 
-'''
-                            variables_and_assignment
+                           <h1> variables_and_assignment</h1>
 
-'''
+
 
 
 # x = 42          # create int object 42, bind the name "x" to it
