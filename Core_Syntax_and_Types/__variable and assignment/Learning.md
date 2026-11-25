@@ -1,13 +1,7 @@
 
-<<<<<<< HEAD
                            <h1> variables_and_assignment</h1>
 
 
-=======
-
-                            <h1>variables_and_assignment</h1>
-
->>>>>>> 10dd4462ca5e0bc65b6b1a53353a923365d60479
 
 
 # x = 42          # create int object 42, bind the name "x" to it
